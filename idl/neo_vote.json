@@ -1,0 +1,340 @@
+{
+  "version": "0.1.0",
+  "name": "neo_vote",
+  "instructions": [
+    {
+      "name": "initializeElection",
+      "accounts": [
+        {
+          "name": "election",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "electionId",
+          "type": "string"
+        },
+        {
+          "name": "candidates",
+          "type": {
+            "vec": "string"
+          }
+        },
+        {
+          "name": "startTime",
+          "type": "i64"
+        },
+        {
+          "name": "endTime",
+          "type": "i64"
+        }
+      ]
+    },
+    {
+      "name": "registerVoter",
+      "accounts": [
+        {
+          "name": "voter",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "election",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "voterId",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "castVote",
+      "accounts": [
+        {
+          "name": "vote",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "voter",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "election",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "voterAccount",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "candidateIndex",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "name": "tallyResults",
+      "accounts": [
+        {
+          "name": "election",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": []
+    }
+  ],
+  "accounts": [
+    {
+      "name": "Election",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "electionId",
+            "type": "string"
+          },
+          {
+            "name": "candidates",
+            "type": {
+              "vec": "string"
+            }
+          },
+          {
+            "name": "startTime",
+            "type": "i64"
+          },
+          {
+            "name": "endTime",
+            "type": "i64"
+          },
+          {
+            "name": "totalVotes",
+            "type": "u64"
+          },
+          {
+            "name": "results",
+            "type": {
+              "vec": "u64"
+            }
+          },
+          {
+            "name": "authority",
+            "type": "publicKey"
+          },
+          {
+            "name": "isActive",
+            "type": "bool"
+          },
+          {
+            "name": "isFinalized",
+            "type": "bool"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Voter",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "voterId",
+            "type": "string"
+          },
+          {
+            "name": "electionId",
+            "type": "string"
+          },
+          {
+            "name": "isRegistered",
+            "type": "bool"
+          },
+          {
+            "name": "hasVoted",
+            "type": "bool"
+          },
+          {
+            "name": "votesCast",
+            "type": "u8"
+          },
+          {
+            "name": "authority",
+            "type": "publicKey"
+          },
+          {
+            "name": "election",
+            "type": "publicKey"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Vote",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "voterId",
+            "type": "string"
+          },
+          {
+            "name": "electionId",
+            "type": "string"
+          },
+          {
+            "name": "candidateIndex",
+            "type": "u8"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "authority",
+            "type": "publicKey"
+          },
+          {
+            "name": "election",
+            "type": "publicKey"
+          },
+          {
+            "name": "voter",
+            "type": "publicKey"
+          }
+        ]
+      }
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "InvalidTimeRange",
+      "msg": "Invalid time range: start time must be before end time"
+    },
+    {
+      "code": 6001,
+      "name": "StartTimeInPast",
+      "msg": "Election has not started yet."
+    },
+    {
+      "code": 6002,
+      "name": "NotEnoughCandidates",
+      "msg": "Election has not started yet."
+    },
+    {
+      "code": 6003,
+      "name": "ElectionNotStarted",
+      "msg": "Election has not started yet."
+    },
+    {
+      "code": 6004,
+      "name": "ElectionEnded",
+      "msg": "Election has already ended."
+    },
+    {
+      "code": 6005,
+      "name": "VoterNotRegistered",
+      "msg": "Voter is not registered."
+    },
+    {
+      "code": 6006,
+      "name": "VoterAlreadyVoted",
+      "msg": "Voter has already voted."
+    },
+    {
+      "code": 6007,
+      "name": "VoterAlreadyRegistered",
+      "msg": "Voter is already registered."
+    },
+    {
+      "code": 6008,
+      "name": "InvalidCandidate",
+      "msg": "Invalid candidate index."
+    },
+    {
+      "code": 6009,
+      "name": "ElectionNotActive",
+      "msg": "Election is not active."
+    },
+    {
+      "code": 6010,
+      "name": "Unauthorized",
+      "msg": "Unauthorized access."
+    },
+    {
+      "code": 6011,
+      "name": "ElectionAlreadyFinalized",
+      "msg": "Election results are already finalized."
+    },
+    {
+      "code": 6012,
+      "name": "InvalidVoterId",
+      "msg": "Invalid voter ID."
+    },
+    {
+      "code": 6013,
+      "name": "VoterIdTooLong",
+      "msg": "Voter ID is too long."
+    },
+    {
+      "code": 6014,
+      "name": "MismatchedElection",
+      "msg": "Mismatched election."
+    }
+  ]
+}
